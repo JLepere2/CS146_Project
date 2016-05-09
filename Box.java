@@ -18,7 +18,7 @@ import javax.swing.Timer;
  */
 public class Box extends JPanel implements ActionListener, KeyListener
 {
-	private static final int VELOCITY = 10;
+	private static final int BOX_VELOCITY = 10;
 	public static final int LENGTH = 10;
 	private static final int MAX_X = 590;
 	private static final int MIN_X = 0;
@@ -31,6 +31,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	public int[][] minXatHeight;
 	
     int x,y;
+    int blockVelocity;
     int jumpVelocity;
     int fallVelocity;
     
@@ -68,12 +69,18 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	ArrayList<Level> levelHolder;
 	
 	Random gen;
+	
+	String status;
     
     /**
      * Creates the box with user inputed x and y top left coordinates
      */
     public Box()
     {   
+    	
+    	status = "Alive";
+    	
+    	blockVelocity = 10;
     	
     	gen = new Random();
     	canMove = false;
@@ -229,7 +236,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	public void left() {
 		
 		if(x != currentMinX) {
-			x -= VELOCITY;
+			x -= BOX_VELOCITY;
         } else {
             x = currentMinX;
         }
@@ -243,8 +250,8 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	}
 	
 	public void right() {
-		if(x + VELOCITY < currentMaxX) {
-			x += VELOCITY;
+		if(x + BOX_VELOCITY < currentMaxX) {
+			x += BOX_VELOCITY;
         } else {
             x = currentMaxX - 10;
         }
@@ -328,7 +335,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 			int pos = gen.nextInt(20);
 			int currentStackSize = totalPerPos[pos];
 			if (currentStackSize < 13) {
-				Block b = new Block(startTime,10,pos, 330 - (currentStackSize * 30), this);
+				Block b = new Block(startTime,blockVelocity,pos, 330 - (currentStackSize * 30), this);
 				this.add(b);
 				blocks.add(b);
 				int randomDelay = gen.nextInt(800);				
@@ -337,7 +344,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				int badNumber = gen.nextInt(100);
 				if (badNumber < 20) {
 					int newPos = gen.nextInt(20);
-					blocks.add(new Laser(startTime,10,newPos,0,this));
+					blocks.add(new Laser(startTime,blockVelocity*2,newPos,0,this));
 					randomDelay = gen.nextInt(800);				
 					startTime += randomDelay + 200;
 				}
@@ -434,7 +441,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 
 			} else {
 				resetBoxTimer.stop();
-				popBlocks();
+				if (status != "Dead") {
+					popBlocks();
+				}
 			}
 		}
 	}
@@ -486,6 +495,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	}
 	
 	public void nextLevel() {
+		blockVelocity += 5;
 		pops.clear();
 		resetMovementSpecs();
 		generateBlocks();
@@ -508,5 +518,14 @@ public class Box extends JPanel implements ActionListener, KeyListener
 			nextLevel();
 		}
 		
+	}
+	
+	public void dead() {
+		status = "Dead";
+		moveBoxToCenter();
+		blocks.clear();
+		levelTimer.stop();
+		levelHolder.clear();
+		scoreTimer.stop();
 	}
 }

@@ -20,10 +20,10 @@ public class Laser implements FallingObject {
 	
 	public Laser(int startTime, int velocity, int position, int maxY, Box parent) {
 		
-		this.x = position*30 + 9;
+		this.x = position*30 + 10;
 		this.y = 0;
 		this.length = 50;
-		this.width = 11;
+		this.width = 10;
 		
 		this.parentBox = parent;
 		
@@ -67,6 +67,7 @@ public class Laser implements FallingObject {
 			y += velocity;
 			if (isDead()) {
 				System.out.println("Dead");
+				parentBox.dead();
 			}
 		}
 	}
@@ -83,7 +84,7 @@ public class Laser implements FallingObject {
 		int boxY = parentBox.y;
 		int boxLength = parentBox.LENGTH;
 	
-		if (boxX > x && boxX < x + length && boxY < y + length && boxY > y) {
+		if (boxX == x && boxY < y + length && boxY > y) {
 			return true;
 		}
 		return false;

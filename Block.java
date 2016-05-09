@@ -66,6 +66,10 @@ public class Block extends JComponent implements FallingObject {
 			} else {
 				y += velocity;
 			}
+			if (isDead()) {
+				System.out.println("Dead");
+				parentBox.dead();
+			}
 		}
 	}
 	
@@ -118,6 +122,17 @@ public class Block extends JComponent implements FallingObject {
 	
 	public void stopStartTimer() {
 		startMoveDownTimer.stop();
+	}
+	
+	public boolean isDead() {
+		int boxX = parentBox.x;
+		int boxY = parentBox.y;
+		int boxLength = parentBox.LENGTH;
+	
+		if (boxY == y+20 && boxX < x + length && boxX > x) {
+			return true;
+		}
+		return false;
 	}
 
 	public String getName() {
