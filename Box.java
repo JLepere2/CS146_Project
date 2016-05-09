@@ -55,6 +55,8 @@ public class Box extends JPanel implements ActionListener, KeyListener
     
     Timer popBoxesTimer;
     
+    int numberOfBoxesToPop;
+    
     /**
      * Creates the box with user inputed x and y top left coordinates
      */
@@ -82,17 +84,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
         
         blocks = new ArrayList<Block>();
         generateBlocks();
-        
-        this.maxYatPos = new int[TOTAL_BLOCK_POSITIONS];
-        this.maxXatHeight = new int[13][20];
-        this.minXatHeight = new int[13][20];
-        for (int i = 0; i < maxYatPos.length; i ++) {
-        	maxYatPos[i] = 360;
-        	for (int j = 0; j < 13; j ++) {
-        		maxXatHeight[j][i] = 600;
-        		minXatHeight[j][i] = 0;
-        	}
-        }
+        resetMovementSpecs();
         
         key = new Key();
         
@@ -107,6 +99,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
         
         currentStackPos = 0;
     	currentIndex = 0;
+    	numberOfBoxesToPop = 0;
     	
     	ActionListener  popBoxes = new PopBlocks();
     	this.popBoxesTimer = new Timer(100,popBoxes);
@@ -138,6 +131,19 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		key.draw(g2);
 		
 		draw(g2);
+    }
+    
+    public void resetMovementSpecs() {
+    	this.maxYatPos = new int[TOTAL_BLOCK_POSITIONS];
+        this.maxXatHeight = new int[13][20];
+        this.minXatHeight = new int[13][20];
+        for (int i = 0; i < maxYatPos.length; i ++) {
+        	maxYatPos[i] = 360;
+        	for (int j = 0; j < 13; j ++) {
+        		maxXatHeight[j][i] = 600;
+        		minXatHeight[j][i] = 0;
+        	}
+        }
     }
 
 	public void keyTyped(KeyEvent e) {
@@ -321,23 +327,24 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	}
 	
 	public void removeBlocks() {
-		
 		while (!didRemoveAllButStopped()) {
 			for (int i = 0; i < blocks.size(); i ++) {
 				Block b = blocks.get(i);
 				if (b.startTimerIsRunning()) {
 					b.stopStartTimer();
 					blocks.remove(b);
+					i--;
+				} else {
+					numberOfBoxesToPop ++;
 				}
 			}
 		}
-		
-		
+		numberOfBoxesToPop = 0;
 		moveBoxToCenter();
 	}
 	
 	public boolean didRemoveAllButStopped() {
-		if (blocks.size() == Block.totalRunning) {
+		if (blocks.size() == numberOfBoxesToPop) {
 			return true;
 		}
 		return false;
@@ -347,7 +354,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		canMove = false;
 		fallTimer.stop();
 		jumpTimer.stop();
-		resetBoxTimer.start();
+		//resetBoxTimer.start();
+		System.out.println("About to Move");
+		resetBoxTimer.restart();
+		System.out.println("Started Moving");
 	}
 	
 	class resetBoxTimer implements ActionListener {
@@ -361,7 +371,6 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				} else {
 					 x -= 10;
 				}
-				System.out.println(x);
 			} else if (y != 350) {
 				if (y > 340 && y < 360) {
 					y = 360;
@@ -370,7 +379,6 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				} else {
 					y -= 10;
 				}
-				System.out.println(y);
 
 			} else {
 				resetBoxTimer.stop();
@@ -381,7 +389,6 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	
 	public void popBlocks() {
 		for (int i = 0; i < blocks.size(); i ++) {
-			System.out.println("POP");
 			Block b = blocks.get(i);
 			int bPos = b.pos;
 			if (stackOfBlocksAtPos.get(bPos) == null) {
@@ -390,7 +397,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 			}
 			stackOfBlocksAtPos.get(bPos).add(b);
 		}
-		popBoxesTimer.start();
+		popBoxesTimer.restart();
 	}
 	
 	int currentStackPos;
@@ -409,8 +416,17 @@ public class Box extends JPanel implements ActionListener, KeyListener
 			}
 			if (currentStackPos > stackOfBlocksAtPos.size() - 1) {
 				popBoxesTimer.stop();
+				nextLevel();
+				currentStackPos = 0;
+				currentIndex = 0;
 			}
 		}
-		
+	}
+	
+	public void nextLevel() {
+		resetMovementSpecs();
+		generateBlocks();
+		canMove = true;
+		canJump = true;
 	}
 }
