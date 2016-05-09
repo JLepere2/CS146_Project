@@ -20,7 +20,7 @@ public class Score extends JComponent {
 	
 	public void draw(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
-		g2.setColor(Color.BLACK);repaint();
+		g2.setColor(Color.BLACK);
 		g2.setFont(new Font("Arial Bold", Font.BOLD, 12));
 		g2.drawString("Score: " + score, x, y);
 		

@@ -7,8 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 
@@ -64,6 +62,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
     Score score;
     Timer scoreTimer;
     
+    int level;
+    
+    Timer levelTimer;
+	ArrayList<Level> levelHolder;
+    
     /**
      * Creates the box with user inputed x and y top left coordinates
      */
@@ -90,8 +93,8 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		this.fallTimer = new Timer(100, fall);
         
         blocks = new ArrayList<Block>();
-        generateBlocks();
-        resetMovementSpecs();
+        //generateBlocks();
+        //resetMovementSpecs();
         
         key = new Key();
         
@@ -117,15 +120,22 @@ public class Box extends JPanel implements ActionListener, KeyListener
     	
     	ScoreTimerAction scoreAction = new ScoreTimerAction();
     	scoreTimer = new Timer(100, scoreAction);
-    	scoreTimer.start();
-    }
+    	
+    	int level = 1;
+    	
+    	LevelAction levelAction = new LevelAction();
+    	levelTimer = new Timer(2000, levelAction);
+    	levelHolder = new ArrayList<>();
+    	levelHolder.add(new Level(level));
+    	levelTimer.start();
+    	
+    	}
     
     class ScoreTimerAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
 			score.incrementScore(10);
 		}
-    	
     }
 
     
@@ -146,6 +156,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
     public void paintComponent(Graphics g) {
     	Graphics2D g2 = (Graphics2D) g;
 		
+    	for (int i = 0; i < levelHolder.size(); i ++) {
+    		levelHolder.get(i).draw(g2);
+    	}
+    	
 		for (int i = 0; i < blocks.size(); i ++) {
 			Block b = blocks.get(i);
 			b.draw(g2);
@@ -434,7 +448,6 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	class PopBlocks implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("pop");
 			Stack<Block> blocksAtPos = stackOfBlocksAtPos.get(currentStackPos);
 			if (!blocksAtPos.isEmpty()) {
 				Block b = blocksAtPos.pop();
@@ -447,7 +460,15 @@ public class Box extends JPanel implements ActionListener, KeyListener
 			}
 			if (currentStackPos > stackOfBlocksAtPos.size() - 1) {
 				popBoxesTimer.stop();
-				nextLevel();
+				System.out.println(level);
+				if (level == 0) {
+					level = 2;
+				} else {
+					 level ++;
+				}
+				System.out.println(level);
+				levelHolder.add(new Level(level));
+				levelTimer.start();
 				currentStackPos = 0;
 				currentIndex = 0;
 			}
@@ -461,5 +482,15 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		canMove = true;
 		canJump = true;
 		scoreTimer.start();
+	}
+	
+	class LevelAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			levelTimer.stop();
+			levelHolder.clear();
+			nextLevel();
+		}
+		
 	}
 }
