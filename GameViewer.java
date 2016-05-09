@@ -8,7 +8,7 @@ public class GameViewer extends JFrame {
 		
 		JFrame frame = new JFrame();
 		frame.setTitle("BOX GAME");
-		frame.setSize(600, 382);
+		frame.setSize(360, 382);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setResizable(false);
 		frame.setBackground(Color.WHITE);

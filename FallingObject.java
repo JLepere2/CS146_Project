@@ -10,6 +10,7 @@ public interface FallingObject {
 	public void stop();
 	public boolean startTimerIsRunning();
 	public void stopStartTimer(); 
+	public void stopAndRemove();
 	
 	public String getName();
 }

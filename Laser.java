@@ -95,4 +95,9 @@ public class Laser implements FallingObject {
 		return false;
 	}
 	
+	public void stopAndRemove() {
+		startMoveDownTimer.stop();
+		moveDownTimer.stop();
+	}
+	
 }

@@ -52,6 +52,11 @@ public class Icicle implements FallingObject {
 			startMoveDownTimer.stop();
 		}
 	}
+	
+	public void stopAndRemove() {
+		startMoveDownTimer.stop();
+		moveDownTimer.stop();
+	}
 
 	public boolean startTimerIsRunning() {
 		return startMoveDownTimer.isRunning();

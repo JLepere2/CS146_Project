@@ -60,7 +60,7 @@ public class Block extends JComponent implements FallingObject {
 				if (pos > 0) {
 					parentBox.maxXatHeight[maxY/30][pos - 1] = (pos * 30) ;
 				}
-				if (pos < 19) {
+				if (pos < 11) {
 					parentBox.minXatHeight[maxY/30][pos + 1] = (pos + 1) * 30;
 				}
 			} else {
@@ -121,6 +121,11 @@ public class Block extends JComponent implements FallingObject {
 		if (startMoveDownTimer.isRunning()) {
 			startMoveDownTimer.stop();
 		}
+	}
+	
+	public void stopAndRemove() {
+		startMoveDownTimer.stop();
+		moveDownTimer.stop();
 	}
 	
 	public boolean startTimerIsRunning() {

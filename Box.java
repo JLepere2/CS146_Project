@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Stack;
 
@@ -24,7 +25,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	private static final int MIN_X = 0;
 	private static final int MIN_Y = 0;
 	private static final int MAX_Y = 350;
-	private static final int TOTAL_BLOCK_POSITIONS = 20;
+	private static final int TOTAL_BLOCK_POSITIONS = 12;
 	
 	public int[] maxYatPos;
 	public int[][] maxXatHeight;
@@ -80,7 +81,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
     	
     	status = "Alive";
     	
-    	blockVelocity = 10;
+    	blockVelocity = 5;
     	
     	gen = new Random();
     	canMove = false;
@@ -98,10 +99,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
         jumpVelocity = 9;
         fallVelocity = 0;
         ActionListener jump = new Jump();
-		this.jumpTimer = new Timer(100,jump);
+		this.jumpTimer = new Timer(60,jump);
 		
 		ActionListener fall = new Fall();
-		this.fallTimer = new Timer(100, fall);
+		this.fallTimer = new Timer(60, fall);
         
         blocks = new ArrayList<FallingObject>();
         //generateBlocks();
@@ -113,7 +114,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
         this.resetBoxTimer = new Timer(100,resetBox);
         
         stackOfBlocksAtPos = new ArrayList<Stack<Block>>();
-        for (int i = 0; i < 20; i ++) {
+        for (int i = 0; i < TOTAL_BLOCK_POSITIONS; i ++) {
         	Stack<Block> stack = new Stack<>();
         	stackOfBlocksAtPos.add(stack);
         }
@@ -186,17 +187,21 @@ public class Box extends JPanel implements ActionListener, KeyListener
 			p.draw(g2);
 		}
 		
-		score.draw(g2);
+		if (status == "Alive") {
+			score.draw(g2);
+		} else {
+			score.drawDead(g2);
+		}
     }
     
     public void resetMovementSpecs() {
     	this.maxYatPos = new int[TOTAL_BLOCK_POSITIONS];
-        this.maxXatHeight = new int[12][20];
-        this.minXatHeight = new int[12][20];
+        this.maxXatHeight = new int[12][TOTAL_BLOCK_POSITIONS];
+        this.minXatHeight = new int[12][TOTAL_BLOCK_POSITIONS];
         for (int i = 0; i < maxYatPos.length; i ++) {
         	maxYatPos[i] = 360;
         	for (int j = 0; j < 12; j ++) {
-        		maxXatHeight[j][i] = 600;
+        		maxXatHeight[j][i] = 400;
         		minXatHeight[j][i] = 0;
         	}
         }
@@ -313,6 +318,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
         	if (canMove) {
         		right();
         	}
+        } else if (keyCode == KeyEvent.VK_SPACE) {
+        	if (status == "Dead") {
+        		restart();
+        	}
         }
 		
 	}
@@ -330,9 +339,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	public void generateBlocks() {
 		
 		int startTime = 0;
-		int[] totalPerPos = new int[20];
+		int[] totalPerPos = new int[TOTAL_BLOCK_POSITIONS];
 		while (!isFull(totalPerPos)) {
-			int pos = gen.nextInt(20);
+			int pos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
 			int currentStackSize = totalPerPos[pos];
 			if (currentStackSize < 12) {
 				Block b = new Block(startTime,blockVelocity,pos, 330 - (currentStackSize * 30), this);
@@ -348,7 +357,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 					randomDelay = gen.nextInt(800);				
 					startTime += randomDelay + 200;
 					
-					newPos = gen.nextInt(20);
+					newPos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
 					blocks.add(new Icicle(startTime,blockVelocity*2,newPos,0,this));
 					randomDelay = gen.nextInt(800);				
 					startTime += randomDelay + 200;
@@ -528,7 +537,6 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	public void dead() {
 		status = "Dead";
 		moveBoxToCenter();
-		blocks.clear();
 		levelTimer.stop();
 		levelHolder.clear();
 		scoreTimer.stop();
@@ -536,5 +544,21 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	
 	public void stopJumping() {
 		canJump = false;
+	}
+	
+	public void restart() {
+		blockVelocity = 5;
+		this.score.score = 0;
+		level = 1;
+		status = "Alive";
+		levelTimer.stop();
+		levelHolder.clear();
+		System.out.println(blocks.size());
+		for (int i = 0; i < blocks.size(); i ++) {
+			blocks.get(i).stopAndRemove();
+		}
+		blocks.clear();
+		nextLevel();
+		System.out.println(Arrays.toString(maxYatPos));
 	}
 }
