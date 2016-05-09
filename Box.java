@@ -343,12 +343,12 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				totalPerPos[pos] = currentStackSize + 1;
 				int badNumber = gen.nextInt(100);
 				if (badNumber < 20) {
-					int newPos = gen.nextInt(20);
+					int newPos = gen.nextInt(12);
 					blocks.add(new Laser(startTime,blockVelocity*2,newPos,0,this));
 					randomDelay = gen.nextInt(800);				
 					startTime += randomDelay + 200;
 					
-					newPos = gen.nextInt(12);
+					newPos = gen.nextInt(20);
 					blocks.add(new Icicle(startTime,blockVelocity*2,newPos,0,this));
 					randomDelay = gen.nextInt(800);				
 					startTime += randomDelay + 200;
@@ -532,5 +532,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		levelTimer.stop();
 		levelHolder.clear();
 		scoreTimer.stop();
+	}
+	
+	public void stopJumping() {
+		canJump = false;
 	}
 }

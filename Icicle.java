@@ -9,7 +9,6 @@ import javax.swing.Timer;
 
 public class Icicle implements FallingObject {
 
-	
 	int x,y,length,width;
 	
 	int velocity;
@@ -20,14 +19,15 @@ public class Icicle implements FallingObject {
 	private Box parentBox;
 	
 	public Icicle(int startTime, int velocity, int position, int maxY, Box parent) {
-		this.x = 600;
-		this.y = position * 30 + 20;
-		this.length = 10;
-		this.width = 50;
+		
+		this.x = position*30 + 10;
+		this.y = -50;
+		this.length = 50;
+		this.width = 10;
 		
 		this.parentBox = parent;
 		
-		this.velocity = velocity;
+		this.velocity = 0;
 		
 		ActionListener start = new StartMoveDownTimer();
 		this.startMoveDownTimer = new Timer(startTime,start);
@@ -37,32 +37,13 @@ public class Icicle implements FallingObject {
 		this.moveDownTimer = new Timer(100, moveDown);
 	}
 	
-	class MoveDownTimer implements ActionListener {
-		
-		public void actionPerformed(ActionEvent e) {
-			x -= velocity;
-			if (isDead()) {
-				System.out.println("Dead");
-				parentBox.dead();
-			}
-		}
-	}
-	
-	class StartMoveDownTimer implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			moveDownTimer.start();
-			startMoveDownTimer.stop();
-		}
-	}
-	
 	public void draw(Graphics g) {
-		
 		Graphics2D g2 = (Graphics2D) g;
 		
-		Rectangle icicle = new Rectangle(x,y,width,length);
+		Rectangle laser = new Rectangle(x,y,width,length);
 		
-		g2.setColor(Color.green);
-		g2.fill(icicle);
+		g2.setColor(Color.blue);
+		g2.fill(laser);
 		
 	}
 
@@ -79,20 +60,39 @@ public class Icicle implements FallingObject {
 	public void stopStartTimer() {
 		startMoveDownTimer.stop();
 	}
-
-	public String getName() {
-		return "Icicle";
+	
+	class MoveDownTimer implements ActionListener {
+		
+		public void actionPerformed(ActionEvent e) {
+			y += velocity;
+			if (isDead()) {
+				System.out.println("Dead");
+				parentBox.dead();
+			}
+			velocity ++;
+		}
 	}
-
+	
+	class StartMoveDownTimer implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			moveDownTimer.start();
+			startMoveDownTimer.stop();
+		}
+	}
+	
 	public boolean isDead() {
 		int boxX = parentBox.x;
 		int boxY = parentBox.y;
 		int boxLength = parentBox.LENGTH;
 	
-		if (boxY == y && boxX < x + length && boxX > x) {
+		if (boxX == x && boxY < y + length && boxY > y) {
 			return true;
 		}
 		return false;
+	}
+
+	public String getName() {
+		return "Laser";
 	}
 	
 }
