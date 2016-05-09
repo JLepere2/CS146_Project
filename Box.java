@@ -191,11 +191,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
     
     public void resetMovementSpecs() {
     	this.maxYatPos = new int[TOTAL_BLOCK_POSITIONS];
-        this.maxXatHeight = new int[13][20];
-        this.minXatHeight = new int[13][20];
+        this.maxXatHeight = new int[12][20];
+        this.minXatHeight = new int[12][20];
         for (int i = 0; i < maxYatPos.length; i ++) {
         	maxYatPos[i] = 360;
-        	for (int j = 0; j < 13; j ++) {
+        	for (int j = 0; j < 12; j ++) {
         		maxXatHeight[j][i] = 600;
         		minXatHeight[j][i] = 0;
         	}
@@ -334,7 +334,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		while (!isFull(totalPerPos)) {
 			int pos = gen.nextInt(20);
 			int currentStackSize = totalPerPos[pos];
-			if (currentStackSize < 13) {
+			if (currentStackSize < 12) {
 				Block b = new Block(startTime,blockVelocity,pos, 330 - (currentStackSize * 30), this);
 				this.add(b);
 				blocks.add(b);
@@ -345,6 +345,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				if (badNumber < 20) {
 					int newPos = gen.nextInt(20);
 					blocks.add(new Laser(startTime,blockVelocity*2,newPos,0,this));
+					randomDelay = gen.nextInt(800);				
+					startTime += randomDelay + 200;
+					
+					newPos = gen.nextInt(12);
+					blocks.add(new Icicle(startTime,blockVelocity*2,newPos,0,this));
 					randomDelay = gen.nextInt(800);				
 					startTime += randomDelay + 200;
 				}
@@ -359,7 +364,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		
 		for (int i = 0; i < arr.length; i ++) {
 			int total = arr[i];
-			if (total < 13) {
+			if (total < 12) {
 				return false;
 			}
 		}
