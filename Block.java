@@ -11,7 +11,7 @@ import javax.swing.JComponent;
 import javax.swing.Timer;
 
 
-public class Block extends JComponent{
+public class Block extends JComponent implements FallingObject {
 
 	int x,y;
 	int length;
@@ -118,5 +118,9 @@ public class Block extends JComponent{
 	
 	public void stopStartTimer() {
 		startMoveDownTimer.stop();
+	}
+
+	public String getName() {
+		return "Block";
 	}
 }

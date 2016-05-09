@@ -19,7 +19,7 @@ import javax.swing.Timer;
 public class Box extends JPanel implements ActionListener, KeyListener
 {
 	private static final int VELOCITY = 10;
-	private static final int LENGTH = 10;
+	public static final int LENGTH = 10;
 	private static final int MAX_X = 590;
 	private static final int MIN_X = 0;
 	private static final int MIN_Y = 0;
@@ -34,7 +34,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
     int jumpVelocity;
     int fallVelocity;
     
-    ArrayList<Block> blocks;
+    ArrayList<FallingObject> blocks;
     
     Timer jumpTimer;
     Timer fallTimer;
@@ -66,12 +66,16 @@ public class Box extends JPanel implements ActionListener, KeyListener
     
     Timer levelTimer;
 	ArrayList<Level> levelHolder;
+	
+	Random gen;
     
     /**
      * Creates the box with user inputed x and y top left coordinates
      */
     public Box()
     {   
+    	
+    	gen = new Random();
     	canMove = false;
     	canJump = false;
         x = MIN_X;
@@ -92,7 +96,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		ActionListener fall = new Fall();
 		this.fallTimer = new Timer(100, fall);
         
-        blocks = new ArrayList<Block>();
+        blocks = new ArrayList<FallingObject>();
         //generateBlocks();
         //resetMovementSpecs();
         
@@ -161,8 +165,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
     	}
     	
 		for (int i = 0; i < blocks.size(); i ++) {
-			Block b = blocks.get(i);
-			b.draw(g2);
+			//Block b = (Block) blocks.get(i);
+			//b.draw(g2);
+			blocks.get(i).draw(g2);
 		}
 		
 		key.draw(g2);
@@ -320,7 +325,6 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		int startTime = 0;
 		int[] totalPerPos = new int[20];
 		while (!isFull(totalPerPos)) {
-			Random gen = new Random();
 			int pos = gen.nextInt(20);
 			int currentStackSize = totalPerPos[pos];
 			if (currentStackSize < 13) {
@@ -330,13 +334,19 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				int randomDelay = gen.nextInt(800);				
 				startTime += randomDelay + 200;
 				totalPerPos[pos] = currentStackSize + 1;
+				int badNumber = gen.nextInt(100);
+				if (badNumber < 20) {
+					int newPos = gen.nextInt(20);
+					blocks.add(new Laser(startTime,10,newPos,0,this));
+					randomDelay = gen.nextInt(800);				
+					startTime += randomDelay + 200;
+				}
 			}
 		}
 		
 		this.canJump = true;
 		this.canMove = true;
 	}
-    
 	
 	public boolean isFull(int[] arr) {
 		
@@ -373,8 +383,8 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		scoreTimer.stop();
 		while (!didRemoveAllButStopped()) {
 			for (int i = 0; i < blocks.size(); i ++) {
-				Block b = blocks.get(i);
-				if (b.startTimerIsRunning()) {
+				FallingObject b = blocks.get(i);
+				if (b.startTimerIsRunning() || b.getName() != "Block") {
 					b.stopStartTimer();
 					blocks.remove(b);
 					i--;
@@ -431,7 +441,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	
 	public void popBlocks() {
 		for (int i = 0; i < blocks.size(); i ++) {
-			Block b = blocks.get(i);
+			Block b = (Block) blocks.get(i);
 			int bPos = b.pos;
 			if (stackOfBlocksAtPos.get(bPos) == null) {
 				Stack<Block> blocksAtPos = new Stack<>();
@@ -482,6 +492,12 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		canMove = true;
 		canJump = true;
 		scoreTimer.start();
+		
+		int newY = gen.nextInt(100) + 50;
+		int newX = gen.nextInt(500) + 50;
+		key.x = newX;
+		key.y = newY;
+		
 	}
 	
 	class LevelAction implements ActionListener {
