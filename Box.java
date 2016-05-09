@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Stack;
 
@@ -57,6 +59,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
     
     int numberOfBoxesToPop;
     
+    ArrayList<Pop> pops;
+    
+    Score score;
+    Timer scoreTimer;
+    
     /**
      * Creates the box with user inputed x and y top left coordinates
      */
@@ -103,6 +110,22 @@ public class Box extends JPanel implements ActionListener, KeyListener
     	
     	ActionListener  popBoxes = new PopBlocks();
     	this.popBoxesTimer = new Timer(100,popBoxes);
+    	
+    	pops = new ArrayList<>();
+    	
+    	score = new Score(0,50);
+    	
+    	ScoreTimerAction scoreAction = new ScoreTimerAction();
+    	scoreTimer = new Timer(100, scoreAction);
+    	scoreTimer.start();
+    }
+    
+    class ScoreTimerAction implements ActionListener {
+
+		public void actionPerformed(ActionEvent e) {
+			score.incrementScore(10);
+		}
+    	
     }
 
     
@@ -131,6 +154,13 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		key.draw(g2);
 		
 		draw(g2);
+		
+		for (int i = 0; i < pops.size(); i ++) {
+			Pop p = pops.get(i);
+			p.draw(g2);
+		}
+		
+		score.draw(g2);
     }
     
     public void resetMovementSpecs() {
@@ -204,7 +234,6 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		currentMinX = minXatHeight[(y-10)/30][currentPos];
 		canFall();
 		if (atKey()) {
-			
 			removeBlocks();
 		}
 	}
@@ -327,6 +356,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	}
 	
 	public void removeBlocks() {
+		scoreTimer.stop();
 		while (!didRemoveAllButStopped()) {
 			for (int i = 0; i < blocks.size(); i ++) {
 				Block b = blocks.get(i);
@@ -335,7 +365,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 					blocks.remove(b);
 					i--;
 				} else {
-					numberOfBoxesToPop ++;
+					numberOfBoxesToPop++;
 				}
 			}
 		}
@@ -355,9 +385,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		fallTimer.stop();
 		jumpTimer.stop();
 		//resetBoxTimer.start();
-		System.out.println("About to Move");
 		resetBoxTimer.restart();
-		System.out.println("Started Moving");
 	}
 	
 	class resetBoxTimer implements ActionListener {
@@ -406,11 +434,14 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	class PopBlocks implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
+			System.out.println("pop");
 			Stack<Block> blocksAtPos = stackOfBlocksAtPos.get(currentStackPos);
 			if (!blocksAtPos.isEmpty()) {
 				Block b = blocksAtPos.pop();
 				blocks.remove(b);
+				pops.add(new Pop(b.x,b.y));
 				currentIndex ++;
+				score.incrementScore(50);
 			} else {
 				currentStackPos ++;
 			}
@@ -424,9 +455,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	}
 	
 	public void nextLevel() {
+		pops.clear();
 		resetMovementSpecs();
 		generateBlocks();
 		canMove = true;
 		canJump = true;
+		scoreTimer.start();
 	}
 }

@@ -12,7 +12,7 @@ public class Key extends JComponent {
 	
 	public Key() {
 		this.x = 100;
-		this.y = 300;
+		this.y = 200;
 		this.length = 15;
 		keyColor = Color.yellow;
 	}
