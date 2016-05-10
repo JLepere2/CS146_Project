@@ -8,10 +8,14 @@ import javax.swing.JComponent;
 public class Score extends JComponent {
 	int x,y,score;
 	
-	public Score(int x, int y) {
+	Box parentBox;
+	
+	public Score(int x, int y, Box parentBox) {
 		this.x = x;
 		this.y = y;
 		this.score = 0;
+		
+		this.parentBox = parentBox;
 	}
 	
 	public void incrementScore(int scoreIncrement) {
@@ -29,9 +33,12 @@ public class Score extends JComponent {
 	public void drawDead(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setColor(Color.BLACK);
-		g2.setFont(new Font("Arial Bold", Font.BOLD, 50));
-		g2.drawString("Score: " + score, 250, 150);
 		g2.setFont(new Font("Arial Bold", Font.BOLD, 25));
-		g2.drawString("Press space to restart", 250, 200);
+		g2.drawString("Score: " + score, 75, 150);
+		
+		if (parentBox.canRestart) {
+			g2.setFont(new Font("Arial Bold", Font.BOLD, 25));
+			g2.drawString("Press space to restart", 50, 200);
+		}
 	}
 }

@@ -67,14 +67,10 @@ public class Block extends JComponent implements FallingObject {
 				y += velocity;
 			}
 			if (isDead()) {
-				System.out.println("Dead");
 				parentBox.dead();
 			}
 			if (smash()) {
 				parentBox.stopJumping();
-				System.out.println("y: " + y);
-				System.out.println("BoxY: " + parentBox.y);
-				System.out.println("MaxY: " + maxY);
 				parentBox.y = y + length;
 			}
 		}
@@ -140,8 +136,8 @@ public class Block extends JComponent implements FallingObject {
 		int boxX = parentBox.x;
 		int boxY = parentBox.y;
 		int boxLength = parentBox.LENGTH;
-	
-		if (boxX < x + length && boxX >= x && y == maxY && maxY + length > boxY) {
+		
+		if (boxX < x + length && boxX >= x && y == maxY && maxY + length > boxY && y + 10 < boxY) {
 			return true;
 		}
 		return false;

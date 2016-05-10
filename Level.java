@@ -16,7 +16,7 @@ public class Level {
 		
 		g2.setColor(Color.BLACK);
 		g2.setFont(new Font("Arial Bold", Font.BOLD, 50));
-		g2.drawString("Level " + level, 250, 200);
+		g2.drawString("Level " + level, 75, 100);
 	}
 	
 }

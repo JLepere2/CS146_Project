@@ -72,12 +72,29 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	Random gen;
 	
 	String status;
+	
+	int badItemsProbability;
+	boolean canDie;
+	
+	Timer powerUpTimer;
+	PowerUp powerUp;
+	
+	int currentMaxJumpVelocity;
+	
+	boolean canRestart;
     
     /**
      * Creates the box with user inputed x and y top left coordinates
      */
     public Box()
     {   
+    	
+    	canRestart = false;
+    	
+    	currentMaxJumpVelocity = 9;
+    	
+    	canDie = false;
+    	badItemsProbability = 20;
     	
     	status = "Alive";
     	
@@ -96,7 +113,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
         
         delay = 1000;
         
-        jumpVelocity = 9;
+        jumpVelocity = currentMaxJumpVelocity;
         fallVelocity = 0;
         ActionListener jump = new Jump();
 		this.jumpTimer = new Timer(60,jump);
@@ -128,7 +145,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
     	
     	pops = new ArrayList<>();
     	
-    	score = new Score(0,50);
+    	score = new Score(0,50, this);
     	
     	ScoreTimerAction scoreAction = new ScoreTimerAction();
     	scoreTimer = new Timer(100, scoreAction);
@@ -192,6 +209,12 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		} else {
 			score.drawDead(g2);
 		}
+		
+		if (powerUp != null) {
+			if (powerUp.canDraw()) {
+				powerUp.draw(g2);
+			}
+		}
     }
     
     public void resetMovementSpecs() {
@@ -213,7 +236,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	
 	public void up() {
 		canJump = false;
-		jumpVelocity  = 9;
+		jumpVelocity  = currentMaxJumpVelocity;
 		jumpTimer.start();
 	}
 	
@@ -226,7 +249,12 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				y -= jumpVelocity;
 				jumpVelocity --;
 				if (atKey()) {
+					key.canDraw = false;
 					removeBlocks();
+				}
+				if (powerUp.atPowerUp()) {
+					powerUp.activate();
+					powerUp.hide();
 				}
 			} else {
 				y = yAtCurrentPos - 10;
@@ -251,6 +279,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		canFall();
 		if (atKey()) {
 			removeBlocks();
+			key.canDraw = false;
+		}
+		if (powerUp.atPowerUp()) {
+			powerUp.activate();
+			powerUp.hide();
 		}
 	}
 	
@@ -266,6 +299,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		canFall();
 		if (atKey()) {
 			removeBlocks();
+			key.canDraw = false;
+		}
+		if (powerUp.atPowerUp()) {
+			powerUp.activate();
+			powerUp.hide();
 		}
 	}
 	
@@ -320,7 +358,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
         	}
         } else if (keyCode == KeyEvent.VK_SPACE) {
         	if (status == "Dead") {
-        		restart();
+        		if (canRestart) {
+        			restart();
+        		}
         	}
         }
 		
@@ -350,23 +390,52 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				int randomDelay = gen.nextInt(800);				
 				startTime += randomDelay + 200;
 				totalPerPos[pos] = currentStackSize + 1;
-				int badNumber = gen.nextInt(100);
-				if (badNumber < 20) {
-					int newPos = gen.nextInt(12);
-					blocks.add(new Laser(startTime,blockVelocity*2,newPos,0,this));
-					randomDelay = gen.nextInt(800);				
-					startTime += randomDelay + 200;
-					
-					newPos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
-					blocks.add(new Icicle(startTime,blockVelocity*2,newPos,0,this));
-					randomDelay = gen.nextInt(800);				
-					startTime += randomDelay + 200;
+				if (level == 2) {
+					int badNumber = gen.nextInt(100);
+					if (badNumber < badItemsProbability) {
+						generateIcicle(startTime);
+					}
+				} else if (level == 3) {
+					int badNumber = gen.nextInt(100);
+					if (badNumber < badItemsProbability) {
+						generateLaser(startTime);
+					}
+				} else if (level == 4) {
+					int badNumber = gen.nextInt(100);
+					if (badNumber < badItemsProbability) {
+						generateIcicle(startTime);
+					}
+					badNumber = gen.nextInt(100);
+					if (badNumber < badItemsProbability) {
+						generateLaser(startTime);
+					}
 				}
 			}
 		}
 		
+		int powerUpDelay = gen.nextInt(20000) + 2000;
+		int powerUpX = gen.nextInt(285);
+		int powerUpY = gen.nextInt(100) + 125;
+		
+		powerUp = new HigherJump(powerUpX,powerUpY,powerUpDelay,this);
+		
+		
 		this.canJump = true;
 		this.canMove = true;
+	}
+	
+	private void generateLaser(int startTime) {
+		int newPos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
+		blocks.add(new Laser(startTime,blockVelocity*2,newPos,0,this));
+		int randomDelay = gen.nextInt(800);				
+		startTime += randomDelay + 200;
+	}
+	
+	private void generateIcicle(int startTime) {
+		int newPos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
+		blocks.add(new Icicle(startTime,blockVelocity*2,newPos,0,this));
+		int randomDelay = gen.nextInt(800);				
+		startTime += randomDelay + 200;
 	}
 	
 	public boolean isFull(int[] arr) {
@@ -436,10 +505,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	class resetBoxTimer implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			if (x != 300) {
-				if (x > 290 && x < 310) {
+			if (x != 180) {
+				if (x > 170 && x < 190) {
 					x = 300;
-				} else if (x <= 290) {
+				} else if (x <= 180) {
 					x += 10;
 				} else {
 					 x -= 10;
@@ -457,6 +526,8 @@ public class Box extends JPanel implements ActionListener, KeyListener
 				resetBoxTimer.stop();
 				if (status != "Dead") {
 					popBlocks();
+				} else {
+					canRestart = true;
 				}
 			}
 		}
@@ -509,6 +580,8 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	}
 	
 	public void nextLevel() {
+		currentMaxJumpVelocity = 9;
+		canDie = true;
 		blockVelocity += 5;
 		pops.clear();
 		resetMovementSpecs();
@@ -517,10 +590,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		canJump = true;
 		scoreTimer.start();
 		
-		int newY = gen.nextInt(100) + 50;
-		int newX = gen.nextInt(500) + 50;
+		int newY = gen.nextInt(75) + 50;
+		int newX = gen.nextInt(200) + 50;
 		key.x = newX;
 		key.y = newY;
+		key.canDraw = true;
 		
 	}
 	
@@ -535,11 +609,15 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	}
 	
 	public void dead() {
-		status = "Dead";
-		moveBoxToCenter();
-		levelTimer.stop();
-		levelHolder.clear();
-		scoreTimer.stop();
+		if (canDie) {
+			canRestart = false;
+			status = "Dead";
+			canDie = false;
+			moveBoxToCenter();
+			levelTimer.stop();
+			levelHolder.clear();
+			scoreTimer.stop();
+		}
 	}
 	
 	public void stopJumping() {
@@ -559,6 +637,5 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 		blocks.clear();
 		nextLevel();
-		System.out.println(Arrays.toString(maxYatPos));
 	}
 }

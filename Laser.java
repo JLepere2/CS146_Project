@@ -89,7 +89,7 @@ public class Laser implements FallingObject {
 		int boxY = parentBox.y;
 		int boxLength = parentBox.LENGTH;
 	
-		if (boxY == y && boxX < x + length && boxX > x) {
+		if ((boxY == y) && boxX < x + width && boxX > x) {
 			return true;
 		}
 		return false;
