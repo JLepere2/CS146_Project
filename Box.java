@@ -433,7 +433,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	
 	private void generateIcicle(int startTime) {
 		int newPos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
-		blocks.add(new Icicle(startTime,blockVelocity*2,newPos,0,this));
+		blocks.add(new Icicle(startTime,blockVelocity,newPos,0,this));
 		int randomDelay = gen.nextInt(800);				
 		startTime += randomDelay + 200;
 	}

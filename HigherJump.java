@@ -71,16 +71,16 @@ public class HigherJump extends JComponent implements PowerUp {
 		int boxY = parentBox.y;
 		int boxLength = Box.LENGTH;
 		
-		if (x > boxX && x < (boxX + boxLength) && y > boxY && y < (boxY + boxLength)) {
+		if (boxX > x && boxX < (x + length) && boxY > y && boxY < (y + length)) {
 			return true;
 		}
-		if ((x + length) > boxX && (x + length) < (boxX + boxLength) && y > boxY && y < (boxY + boxLength)) {
+		if ((boxX + boxLength) > x && (boxX + boxLength) < (x + length) && boxY > y && boxY < (y + length)) {
 			return true;
 		}
-		if ((x + length) > boxX && (x + length) < (boxX + boxLength) && (y + length) > boxY && (y + length) < (boxY + boxLength)) {
+		if ((boxX + boxLength) > x && (boxX + boxLength) < (x + length) && (boxY + boxLength) > y && (boxY + boxLength) < (y + length)) {
 			return true;
 		}
-		if (x > boxX && x < (boxX + boxLength) && (y + length) > boxY && (y + length) < (boxY + boxLength)) {
+		if (boxX > x && boxX < (x + length) && (boxY + boxLength) > y && (boxY + boxLength) < (y + length)) {
 			return true;
 		}
 		return false;
