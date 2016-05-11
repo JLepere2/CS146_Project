@@ -2,8 +2,14 @@ import java.awt.Color;
 
 import javax.swing.JFrame;
 
+/**
+ * main class
+ */
 public class GameViewer extends JFrame {
 	
+	/**
+	 * main, runs the game
+	 */
 	public static void main(String[] args) {
 		
 		JFrame frame = new JFrame();

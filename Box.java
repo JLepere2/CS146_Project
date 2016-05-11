@@ -28,78 +28,37 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	private static final int TOTAL_BLOCK_POSITIONS = 12;
 	
 	public int[] maxYatPos;
-	public int[][] maxXatHeight;
-	public int[][] minXatHeight;
+	public int[][] maxXatHeight, minXatHeight;
 	
-    int x,y;
-    int blockVelocity;
-    int jumpVelocity;
-    int fallVelocity;
+    protected int x, y, blockVelocity, jumpVelocity, fallVelocity, delay, currentPos, currentMaxX, currentMinX, numberOfBoxesToPop, level, badItemsProbability, currentMaxJumpVelocity;
+    private String status;
+    protected boolean canMove, canJump, canDie, canRestart;
     
-    ArrayList<FallingObject> blocks;
-    
-    Timer jumpTimer;
-    Timer fallTimer;
-    private boolean canMove;
-    private boolean canJump;
-    
-    int currentPos;
-    int currentMaxX;
-    int currentMinX;
-    
-    Key key;
-    
-    private int delay;
-    
+    private ArrayList<FallingObject> blocks;
     private ArrayList<Stack<Block>> stackOfBlocksAtPos;
+    private ArrayList<Pop> pops;
+    private ArrayList<Level> levelHolder;
     
-    Timer resetBoxTimer;
+    private Timer jumpTimer, fallTimer, resetBoxTimer, popBoxesTimer, scoreTimer, levelTimer, powerUpTimer;
     
-    Timer popBoxesTimer;
     
-    int numberOfBoxesToPop;
-    
-    ArrayList<Pop> pops;
-    
-    Score score;
-    Timer scoreTimer;
-    
-    int level;
-    
-    Timer levelTimer;
-	ArrayList<Level> levelHolder;
-	
-	Random gen;
-	
-	String status;
-	
-	int badItemsProbability;
-	boolean canDie;
-	
-	Timer powerUpTimer;
+    private Key key;
+    private Score score;
+	private Random gen;
 	PowerUp powerUp;
-	
-	int currentMaxJumpVelocity;
-	
-	boolean canRestart;
     
     /**
-     * Creates the box with user inputed x and y top left coordinates
+     * setups up the game's frame
      */
     public Box()
     {   
     	
     	canRestart = false;
-    	
     	currentMaxJumpVelocity = 9;
-    	
     	canDie = false;
     	badItemsProbability = 20;
-    	
     	status = "Alive";
-    	
     	blockVelocity = 5;
-    	
     	gen = new Random();
     	canMove = false;
     	canJump = false;
@@ -160,6 +119,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
     	
     	}
     
+    /**
+     * increments the score
+     */
     class ScoreTimerAction implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -169,7 +131,8 @@ public class Box extends JPanel implements ActionListener, KeyListener
 
     
     /**
-     * Creates the box and other graphics
+     * Draw's the hero
+     * @param graphic g
      */
     public void draw(Graphics g)
     {
@@ -181,7 +144,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
         repaint();
     }
     
-    
+    /**
+     * Handles most of the GUI aspects of the game
+     * @param graphics g
+     */
     public void paintComponent(Graphics g) {
     	Graphics2D g2 = (Graphics2D) g;
 		
@@ -217,6 +183,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
     }
     
+    /**
+     * Sets how many blocks are created for the frame
+     */
     public void resetMovementSpecs() {
     	this.maxYatPos = new int[TOTAL_BLOCK_POSITIONS];
         this.maxXatHeight = new int[12][TOTAL_BLOCK_POSITIONS];
@@ -234,14 +203,23 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		// TODO Auto-generated method stub
 	}
 	
+	/**
+	 *  checks to see if player can jump, jumps if can
+	 */
 	public void up() {
 		canJump = false;
 		jumpVelocity  = currentMaxJumpVelocity;
 		jumpTimer.start();
 	}
 	
+	/**
+	 * jumping class
+	 */
 	class Jump implements ActionListener {
 
+		/**
+		 * performs the jump, constantly redrawing 
+		 */
 		public void actionPerformed(ActionEvent e) {
 			
 			int yAtCurrentPos = maxYatPos[currentPos];
@@ -266,6 +244,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 	}
 	
+	/**
+	 * main left movement
+	 */
 	public void left() {
 		
 		if(x != currentMinX) {
@@ -287,6 +268,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 	}
 	
+	/**
+	 * main right movement
+	 */
 	public void right() {
 		if(x + BOX_VELOCITY < currentMaxX) {
 			x += BOX_VELOCITY;
@@ -307,6 +291,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 	}
 	
+	/**
+	 * Checks to see how far the player will fall
+	 */
 	public void canFall() {
 		if (canJump) {
 			int yAtCurrentPos = maxYatPos[currentPos];
@@ -318,8 +305,14 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 	}
 	
+	/**
+	 *	falling class
+	 */
 	class Fall implements ActionListener {
 
+		/**
+		 * calculates the falling positions
+		 */
 		public void actionPerformed(ActionEvent e) {
 			
 			int yAtCurrentPos = maxYatPos[currentPos];
@@ -340,6 +333,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		
 	}
 	
+	/**
+	 * controller method that calls the appropriate method based
+	 * on button press
+	 * @param KeyEvent e
+	 */
 	public void keyPressed(KeyEvent e) {
 		
 		int keyCode = e.getKeyCode();
@@ -363,9 +361,7 @@ public class Box extends JPanel implements ActionListener, KeyListener
         		}
         	}
         }
-		
 	}
-
 
 	public void keyReleased(KeyEvent e) {
 		
@@ -376,6 +372,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		repaint();	
 	}
 	
+	
+	/**
+	 * method that generates the blocks, uses a stack
+	 */
 	public void generateBlocks() {
 		
 		int startTime = 0;
@@ -424,6 +424,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		this.canMove = true;
 	}
 	
+	/**
+	 * method to generate the lasers
+	 * @param startTime, the startTime of when they appear
+	 */
 	private void generateLaser(int startTime) {
 		int newPos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
 		blocks.add(new Laser(startTime,blockVelocity*2,newPos,0,this));
@@ -431,6 +435,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		startTime += randomDelay + 200;
 	}
 	
+	/**
+	 * method to generate the falling icicles
+	 * @param startTime, the startTime of when they appear
+	 */
 	private void generateIcicle(int startTime) {
 		int newPos = gen.nextInt(TOTAL_BLOCK_POSITIONS);
 		blocks.add(new Icicle(startTime,blockVelocity,newPos,0,this));
@@ -438,6 +446,11 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		startTime += randomDelay + 200;
 	}
 	
+	/**
+	 * checks to see if the stacks are full
+	 * @param arr, the position of the stack
+	 * @return false if not full, true otherwise
+	 */
 	public boolean isFull(int[] arr) {
 		
 		for (int i = 0; i < arr.length; i ++) {
@@ -449,6 +462,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		return true;
 	}
 	
+	/**
+	 * checks to see if the player is at the key
+	 * @return true if they are, false otherwise
+	 */
 	public boolean atKey() {
 		int keyX = key.getX();
 		int keyY = key.getY();
@@ -469,6 +486,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		return false;
 	}
 	
+	/**
+	 * remove all the blocks
+	 */
 	public void removeBlocks() {
 		scoreTimer.stop();
 		while (!didRemoveAllButStopped()) {
@@ -487,6 +507,10 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		moveBoxToCenter();
 	}
 	
+	/**
+	 * if the remove function stopped...
+	 * @return true if it stopped, false if it didnt
+	 */
 	public boolean didRemoveAllButStopped() {
 		if (blocks.size() == numberOfBoxesToPop) {
 			return true;
@@ -494,6 +518,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		return false;
 	}
 	
+	/**
+	 * centers hero
+	 */
 	public void moveBoxToCenter() {
 		canMove = false;
 		fallTimer.stop();
@@ -502,6 +529,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		resetBoxTimer.restart();
 	}
 	
+	/**
+	 * Death screen
+	 */
 	class resetBoxTimer implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
@@ -533,6 +563,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 	}
 	
+	/**
+	 * Pops all the blocks at the victory screen
+	 */
 	public void popBlocks() {
 		for (int i = 0; i < blocks.size(); i ++) {
 			Block b = (Block) blocks.get(i);
@@ -549,8 +582,14 @@ public class Box extends JPanel implements ActionListener, KeyListener
 	int currentStackPos;
 	int currentIndex;
 	
+	/**
+	 * class for popBlocks
+	 */
 	class PopBlocks implements ActionListener {
 
+		/**
+		 * Pops the blocks
+		 */
 		public void actionPerformed(ActionEvent e) {
 			Stack<Block> blocksAtPos = stackOfBlocksAtPos.get(currentStackPos);
 			if (!blocksAtPos.isEmpty()) {
@@ -579,6 +618,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 	}
 	
+	/**
+	 * moves to nextLevel after the blocked are popped
+	 */
 	public void nextLevel() {
 		currentMaxJumpVelocity = 9;
 		canDie = true;
@@ -598,8 +640,14 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		
 	}
 	
+	/**
+	 * moves to next level
+	 */
 	class LevelAction implements ActionListener {
 
+		/**
+		 * moves to next level
+		 */
 		public void actionPerformed(ActionEvent e) {
 			levelTimer.stop();
 			levelHolder.clear();
@@ -608,6 +656,9 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		
 	}
 	
+	/**
+	 * you dead, death screen
+	 */
 	public void dead() {
 		if (canDie) {
 			canRestart = false;
@@ -620,10 +671,16 @@ public class Box extends JPanel implements ActionListener, KeyListener
 		}
 	}
 	
+	/**
+	 * stops jumping
+	 */
 	public void stopJumping() {
 		canJump = false;
 	}
 	
+	/**
+	 * restart the game
+	 */
 	public void restart() {
 		blockVelocity = 5;
 		this.score.score = 0;

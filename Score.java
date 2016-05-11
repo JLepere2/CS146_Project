@@ -5,11 +5,20 @@ import java.awt.Graphics2D;
 
 import javax.swing.JComponent;
 
+/**
+ * Custom score class
+ */
 public class Score extends JComponent {
 	int x,y,score;
 	
 	Box parentBox;
 	
+	/**
+	 * Constructor for Score object
+	 * @param x, the x value
+	 * @param y, the y value
+	 * @param parentBox, the parent box
+	 */
 	public Score(int x, int y, Box parentBox) {
 		this.x = x;
 		this.y = y;
@@ -18,10 +27,18 @@ public class Score extends JComponent {
 		this.parentBox = parentBox;
 	}
 	
+	/**
+	 * increments the score
+	 * @param scoreIncrement, the amount to increment
+	 */
 	public void incrementScore(int scoreIncrement) {
 		this.score += scoreIncrement;
 	}
 	
+	/**
+	 * draws the score 
+	 * @param g
+	 */
 	public void draw(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setColor(Color.BLACK);
@@ -30,6 +47,10 @@ public class Score extends JComponent {
 		
 	}
 	
+	/**
+	 * draws the dead screen text
+	 * @param g
+	 */
 	public void drawDead(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setColor(Color.BLACK);

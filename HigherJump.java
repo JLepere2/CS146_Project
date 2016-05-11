@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
+/**
+ * class for the HigherJump powerup
+ */
 public class HigherJump extends JComponent implements PowerUp {
 
 	Timer startPowerUpTimer;
@@ -16,6 +19,13 @@ public class HigherJump extends JComponent implements PowerUp {
 	boolean canDraw;
 	Box parentBox;
 	
+	/**
+	 * HigherJump constructor
+	 * @param x, the x location
+	 * @param y, the y location
+	 * @param delay, the delay
+	 * @param parentBox, the parent
+	 */
 	public HigherJump(int x, int y, int delay, Box parentBox) {
 		this.x = x;
 		this.y = y;
@@ -30,6 +40,9 @@ public class HigherJump extends JComponent implements PowerUp {
 		this.parentBox = parentBox;
 	}
 	
+	/**
+	 * draws the powerup
+	 */
 	public void draw(Graphics g) {
 		// TODO Auto-generated method stub
 		if (canDraw) {
@@ -48,16 +61,29 @@ public class HigherJump extends JComponent implements PowerUp {
 		}
 	}	
 	
+	/**
+	 * hides the powerup
+	 */
 	public void hide() {
 		canDraw = false;
 	}
 	
+	/**
+	 * checks to see if can draw the powerup at location
+	 * @returns true, if you can, false if you can not
+	 */
 	public boolean canDraw() {
 		return canDraw;
 	}
 	
+	/**
+	 * starts the spawn for the powerup
+	 */
 	class StartAction implements ActionListener {
 
+		/**
+		 * starts the timer and sets canDraw to true
+		 */
 		public void actionPerformed(ActionEvent e) {
 			
 			startPowerUpTimer.stop();
@@ -65,6 +91,9 @@ public class HigherJump extends JComponent implements PowerUp {
 		}
 	}
 	
+	/**
+	 * checks to see if the player is at the powerup
+	 */
 	public boolean atPowerUp() {
 		
 		int boxX = parentBox.x;
@@ -86,6 +115,9 @@ public class HigherJump extends JComponent implements PowerUp {
 		return false;
 	}
 	
+	/**
+	 * activates the powerup, sets the players jump to 15
+	 */
 	public void activate() {
 		parentBox.currentMaxJumpVelocity = 15;
 	}

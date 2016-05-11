@@ -7,6 +7,9 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Timer;
 
+/**
+ * Custom icicle object of falling death
+ */
 public class Icicle implements FallingObject {
 
 	int x,y,length,width;
@@ -18,6 +21,14 @@ public class Icicle implements FallingObject {
 	
 	private Box parentBox;
 	
+	/**
+	 * Constructor for the icicle object
+	 * @param startTime, when it will fall
+	 * @param velocity, the speed it falls at
+	 * @param position, where it will fall
+	 * @param maxY, height it will fall
+	 * @param parent, parent box
+	 */
 	public Icicle(int startTime, int velocity, int position, int maxY, Box parent) {
 		
 		this.x = position*30 + 10;
@@ -37,6 +48,9 @@ public class Icicle implements FallingObject {
 		this.moveDownTimer = new Timer(100, moveDown);
 	}
 	
+	/**
+	 * draws the icicle
+	 */
 	public void draw(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		
@@ -47,27 +61,46 @@ public class Icicle implements FallingObject {
 		
 	}
 
+	/**
+	 * stops the timer
+	 */
 	public void stop() {
 		if (startMoveDownTimer.isRunning()) {
 			startMoveDownTimer.stop();
 		}
 	}
 	
+	/**
+	 * stops the timer and removes the object
+	 */
 	public void stopAndRemove() {
 		startMoveDownTimer.stop();
 		moveDownTimer.stop();
 	}
 
+	/**
+	 * check if the timer is running
+	 * @return true if it is running, false if it is not
+	 */
 	public boolean startTimerIsRunning() {
 		return startMoveDownTimer.isRunning();
 	}
 
+	/**
+	 * stops the startTimer
+	 */
 	public void stopStartTimer() {
 		startMoveDownTimer.stop();
 	}
 	
+	/**
+	 * class to let the icicle fall
+	 */
 	class MoveDownTimer implements ActionListener {
 		
+		/**
+		 * method that allows the icicle to fall
+		 */
 		public void actionPerformed(ActionEvent e) {
 			y += velocity;
 			if (isDead()) {
@@ -78,6 +111,9 @@ public class Icicle implements FallingObject {
 		}
 	}
 	
+	/**
+	 * starts the timer for the dropping icicle
+	 */
 	class StartMoveDownTimer implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			moveDownTimer.start();
@@ -85,6 +121,10 @@ public class Icicle implements FallingObject {
 		}
 	}
 	
+	/**
+	 * checks to see if the player is dead
+	 * @return true if they are, false if they are not
+	 */
 	public boolean isDead() {
 		int boxX = parentBox.x;
 		int boxY = parentBox.y;
@@ -96,6 +136,10 @@ public class Icicle implements FallingObject {
 		return false;
 	}
 
+	/**
+	 * gets the name of the object
+	 * @return "Laser"
+	 */
 	public String getName() {
 		return "Laser";
 	}

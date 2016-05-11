@@ -1,5 +1,9 @@
 import java.awt.Graphics;
 
+
+/**
+ * FallingObject interface
+ */
 public interface FallingObject {
 	//Timer startMoveDownTimer;
 	//Timer moveDownTimer;

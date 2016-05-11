@@ -10,24 +10,25 @@ import java.util.Random;
 import javax.swing.JComponent;
 import javax.swing.Timer;
 
-
+/**
+ * Custom Block object class
+ */
 public class Block extends JComponent implements FallingObject {
 
-	int x,y;
-	int length;
-	int maxY;
-	int velocity;
-	int pos;
-	
+	int x,y, length, maxY, velocity, pos;
 	public static int totalRunning = 0;
-	
-	Timer startMoveDownTimer;
-	Timer moveDownTimer;
-	
+	Timer startMoveDownTimer, moveDownTimer;
 	private Box parentBox;
-	
 	Color boxColor;
 	
+	/**
+	 * creates a block
+	 * @param startTime, when it drops
+	 * @param velocity, speed it drops at
+	 * @param position, where it drops at
+	 * @param maxY, the position
+	 * @param parent, the main box
+	 */
 	public Block(int startTime, int velocity, int position, int maxY, Box parent) {
 		
 		this.x = 30*position;
@@ -47,9 +48,12 @@ public class Block extends JComponent implements FallingObject {
 		
 		Random gen = new Random();
 		this.boxColor = new Color(gen.nextInt(256),gen.nextInt(256),gen.nextInt(256));
-		
 	}
 	
+	
+	/**
+	 * Start the timer for the block to move down
+	 */
 	class MoveDownTimer implements ActionListener {
 		
 		public void actionPerformed(ActionEvent e) {
@@ -76,6 +80,9 @@ public class Block extends JComponent implements FallingObject {
 		}
 	}
 	
+	/**
+	 * starts the timer to drop the block
+	 */
 	class StartMoveDownTimer implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			moveDownTimer.start();
@@ -84,6 +91,9 @@ public class Block extends JComponent implements FallingObject {
 		}
 	}
 	
+	/**
+	 * method to draw the blocks
+	 */
 	public void draw(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		
@@ -113,25 +123,42 @@ public class Block extends JComponent implements FallingObject {
 		
 	}
 	
+	/**
+	 * stops the timer
+	 */
 	public void stop() {
 		if (startMoveDownTimer.isRunning()) {
 			startMoveDownTimer.stop();
 		}
 	}
 	
+	/**
+	 * stops timer and gets ready to remove all the blocks
+	 */
 	public void stopAndRemove() {
 		startMoveDownTimer.stop();
 		moveDownTimer.stop();
 	}
 	
+	/**
+	 * checks to see if the startTimer is running
+	 * @return true if the startTimer is running, false otherwise
+	 */
 	public boolean startTimerIsRunning() {
 		return startMoveDownTimer.isRunning();
 	}
 	
+	/**
+	 * stops the startTimer
+	 */
 	public void stopStartTimer() {
 		startMoveDownTimer.stop();
 	}
 	
+	/**
+	 * checks to see if the hero is dead
+	 * @return true if he's dead, false otherwise
+	 */
 	public boolean isDead() {
 		int boxX = parentBox.x;
 		int boxY = parentBox.y;
@@ -143,6 +170,10 @@ public class Block extends JComponent implements FallingObject {
 		return false;
 	}
 	
+	/**
+	 * checks to see if player is about to get smashed by a block
+	 * @return true if player's about to get smashed, false otherwise
+	 */
 	public boolean smash() {
 	
 		int boxX = parentBox.x;
@@ -156,6 +187,10 @@ public class Block extends JComponent implements FallingObject {
 		return false;
 	}
 
+	/**
+	 * gets the name of the object
+	 * @return "Block"
+	 */
 	public String getName() {
 		return "Block";
 	}

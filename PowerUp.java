@@ -1,5 +1,9 @@
 import java.awt.Graphics;
 
+/**
+ * powerup interface
+ */
+
 public interface PowerUp {
 
 	public void draw(Graphics g);
